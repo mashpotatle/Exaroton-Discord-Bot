@@ -25,11 +25,20 @@ Key Features
     
     /whitelist Update username: – Update your username for the server's whitelist if it has changed.
 
-    /whitelist Remove username: – Remove your current whitelisted username.
+    /whitelist Remove: – Remove your current whitelisted username.
 
     /whitelist Show: – Shows your current whitelisted username
     
     /deathcount – Shows death count per your whitelisted username
+
+Admin Only Commands
+
+    /list - shows all discord accounts with listed usernames
+
+    /resync roles - resync player roles from whitelist.json
+
+    /resync exaroton - resync player roles from whitelist.json
+
 ![Wally West Solos](Untitled.jpg)
 
 
