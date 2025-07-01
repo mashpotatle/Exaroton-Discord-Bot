@@ -1,6 +1,6 @@
 # Exaroton Discord Bot
 
-This is the official Discord bot for the turtleshell.exaroton.me vanilla Minecraft SMP server. It lets you chat with your teammates across Discord and Minecraft seamlessly, keeping the conversation alive no matter where you’re at.
+This is the official Discord bot for the turtleshell.exaroton.me vanilla Minecraft SMP server. It lets you chat with your teammates across Discord and Minecraft seamlessly, keeping the game alive no matter where you’re at.
 Key Features
 
 -  Discord ↔ Minecraft Chat Bridge: Talk with your SMP teammates on Discord or in-game with messages synced both ways.
