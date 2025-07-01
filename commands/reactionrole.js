@@ -3,7 +3,7 @@ const path = require('path');
 const { PermissionFlagsBits } = require('discord.js');
 const { SlashCommandBuilder } = require('discord.js');
 
-const MOD_ROLE_ID = '1384827724434112512';
+const MOD_ROLE_ID = process.env.MOD_ROLE_ID;
 const REACT_FILE = path.join(__dirname, '..', 'data', 'reactionroles.json');
 if (!fs.existsSync(REACT_FILE)) fs.writeFileSync(REACT_FILE, '[]');
 

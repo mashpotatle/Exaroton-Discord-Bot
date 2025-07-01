@@ -3,7 +3,7 @@ const { Client: ExarotonClient } = require('exaroton');
 const fs = require('fs');
 const path = require('path');
 
-const MOD_ROLE_ID = '1384827724434112512';
+const MOD_ROLE_ID = process.env.MOD_ROLE_ID;
 const WHITELIST_FILE = path.join(__dirname, '..', 'data', 'whitelist.json');
 const exaClient = new ExarotonClient(process.env.EXAROTON_TOKEN);
 const server = exaClient.server(process.env.EXAROTON_SERVER_ID);

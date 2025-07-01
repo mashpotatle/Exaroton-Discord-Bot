@@ -3,7 +3,7 @@ const path = require('path');
 const { PermissionFlagsBits } = require('discord.js');
 const { SlashCommandBuilder } = require('discord.js');
 
-const MOD_ROLE_ID = '1384827724434112512';
+const MOD_ROLE_ID = process.env.MOD_ROLE_ID;
 const WHITELIST_FILE = path.join(__dirname, '..', 'data', 'whitelist.json');
 
 module.exports = {

@@ -32,6 +32,10 @@ const commandFiles = fs.readdirSync(path.join(__dirname, 'commands')).filter(fil
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
+  if (!command || !command.data || !command.data.name) {
+    console.warn(`Skipping invalid command file: ${file}`);
+    continue;
+  }
   bot.commands.set(command.data.name, command);
   commandsArray.push(command.data.toJSON());
 }
