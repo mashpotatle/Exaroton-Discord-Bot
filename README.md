@@ -30,5 +30,6 @@ Key Features
     /whitelist Show: – Shows your current whitelisted username
     
     /deathcount – Shows death count per your whitelisted username
-    
+![Wally West Solos](Untitled.jpg)
+
 
