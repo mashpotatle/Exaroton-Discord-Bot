@@ -121,6 +121,35 @@ bot.on('messageReactionRemove', async (reaction, user) => {
   if (m) await m.roles.remove(match.roleId).catch(() => {});
 });
 
+// Track message blocks for anti-spam
+const oppBlockTimestamps = [];
+
+bot.on('messageCreate', async (message) => {
+  // Delete any message sent by user with tag 'top 10 operation#7520'
+  if (message.author && message.author.tag === 'top 10 operation#7520') {
+    await message.delete().catch(() => {});
+    await message.channel.send('NO OPPS ALLOWED❌').catch(() => {});
+    // Track timestamp
+    const now = Date.now();
+    oppBlockTimestamps.push(now);
+    // Remove timestamps older than 7 seconds
+    while (oppBlockTimestamps.length && now - oppBlockTimestamps[0] > 7000) {
+      oppBlockTimestamps.shift();
+    }
+    // If more than 5 blocks in 7 seconds, timeout the user
+    if (oppBlockTimestamps.length > 5) {
+      try {
+        const guild = message.guild;
+        const member = await guild.members.fetch(message.author.id);
+        await member.timeout?.(60 * 1000, 'Spamming as top 10 operation#7520'); // 1 minute timeout
+        await message.channel.send(`<@${message.author.id}> has been timed out for spamming.`).catch(() => {});
+      } catch {}
+      oppBlockTimestamps.length = 0; // Reset
+    }
+    return;
+  }
+});
+
 const TARGET_PARENT_CHANNEL_ID = '1385785222246957056';
 const DISCORD_MC_CHANNEL_ID = '1388385500846493747';
 
