@@ -3,15 +3,13 @@ const path = require('path');
 const cron = require('node-cron');
 const { Client, Collection, GatewayIntentBits, REST, Routes, Partials } = require('discord.js');
 const { Client: ExarotonClient } = require('exaroton');
-const { registerWorldChatRelay } = require('./worldchat');
+const { registerWorldChatSync } = require('./utils/worldchat-sync');
 require('dotenv').config();
 
 const WHITELIST_FILE = path.join(__dirname, 'data', 'whitelist.json');
-const REACT_FILE = path.join(__dirname, 'data', 'reactionroles.json');
 
 if (!fs.existsSync('data')) fs.mkdirSync('data');
 if (!fs.existsSync(WHITELIST_FILE)) fs.writeFileSync(WHITELIST_FILE, '{}');
-if (!fs.existsSync(REACT_FILE)) fs.writeFileSync(REACT_FILE, '[]');
 
 const bot = new Client({
   intents: [
@@ -40,7 +38,7 @@ for (const file of commandFiles) {
   commandsArray.push(command.data.toJSON());
 }
 
-const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
+const rest = new REST({ version: '10' }).setToken(process.env.DISCORDBOT_TOKEN);
 const exaClient = new ExarotonClient(process.env.EXAROTON_TOKEN);
 const server = exaClient.server(process.env.EXAROTON_SERVER_ID);
 
@@ -53,8 +51,8 @@ bot.once('ready', async () => {
     console.error('❌ Failed to register commands:', err);
   }
 
-  // Start both directions of Minecraft <-> Discord chat relay
-  registerWorldChatRelay(bot);
+  // Start Minecraft <-> Discord chat sync
+  registerWorldChatSync(bot);
 
   // Daily sync whitelist to Exaroton (12PM AEST = 2AM UTC)
   cron.schedule('0 2 * * *', async () => {
@@ -89,68 +87,13 @@ bot.on('interactionCreate', async interaction => {
   }
 });
 
-bot.on('messageReactionAdd', async (reaction, user) => {
-  if (user.bot) return;
-  if (reaction.partial) try { await reaction.fetch(); } catch {}
-
-  const data = JSON.parse(fs.readFileSync(REACT_FILE));
-  const ent = data.find(e => e.messageId === reaction.message.id);
-  if (!ent) return;
-
-  const match = ent.roles.find(r => r.emoji === reaction.emoji.name);
-  if (!match) return;
-
-  const g = await bot.guilds.fetch(ent.guildId);
-  const m = await g.members.fetch(user.id).catch(() => null);
-  if (m) await m.roles.add(match.roleId).catch(() => {});
-});
-
-bot.on('messageReactionRemove', async (reaction, user) => {
-  if (user.bot) return;
-  if (reaction.partial) try { await reaction.fetch(); } catch {}
-
-  const data = JSON.parse(fs.readFileSync(REACT_FILE));
-  const ent = data.find(e => e.messageId === reaction.message.id);
-  if (!ent) return;
-
-  const match = ent.roles.find(r => r.emoji === reaction.emoji.name);
-  if (!match) return;
-
-  const g = await bot.guilds.fetch(ent.guildId);
-  const m = await g.members.fetch(user.id).catch(() => null);
-  if (m) await m.roles.remove(match.roleId).catch(() => {});
-});
-
 // Track message blocks for anti-spam
-const oppBlockTimestamps = [];
 
 bot.on('messageCreate', async (message) => {
-  // Delete any message sent by user with tag 'top 10 operation#7520'
-  if (message.author && message.author.tag === 'top 10 operation#7520') {
-    await message.delete().catch(() => {});
-    await message.channel.send('NO OPPS ALLOWED❌').catch(() => {});
-    // Track timestamp
-    const now = Date.now();
-    oppBlockTimestamps.push(now);
-    // Remove timestamps older than 7 seconds
-    while (oppBlockTimestamps.length && now - oppBlockTimestamps[0] > 7000) {
-      oppBlockTimestamps.shift();
-    }
-    // If more than 5 blocks in 7 seconds, timeout the user
-    if (oppBlockTimestamps.length > 5) {
-      try {
-        const guild = message.guild;
-        const member = await guild.members.fetch(message.author.id);
-        await member.timeout?.(60 * 1000, 'Spamming as top 10 operation#7520'); // 1 minute timeout
-        await message.channel.send(`<@${message.author.id}> has been timed out for spamming.`).catch(() => {});
-      } catch {}
-      oppBlockTimestamps.length = 0; // Reset
-    }
-    return;
-  }
+  // ...other messageCreate logic (if any)...
 });
 
 const TARGET_PARENT_CHANNEL_ID = '1385785222246957056';
 const DISCORD_MC_CHANNEL_ID = '1388385500846493747';
 
-bot.login(process.env.TOKEN);
+bot.login(process.env.DISCORDBOT_TOKEN);

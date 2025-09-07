@@ -1,6 +1,6 @@
 // utils/permissions.js
 
-const MOD_ROLE_ID = '1384827724434112512'; // your mod role ID
+const MOD_ROLE_ID = process.env.MOD_ROLE_ID;
 
 function isModerator(member) {
   return member.roles.cache.has(MOD_ROLE_ID);
