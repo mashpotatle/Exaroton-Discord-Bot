@@ -1,45 +1,106 @@
 # Exaroton Discord Bot
 
-This is a custom Discord bot designed to enhance the multiplayer experience on an exatron server. It provides a seamless integration between Discord and the Minecraft server, allowing players to communicate and manage their whitelist status easily.
+A Discord bot that bridges your Discord server and your [Exaroton](https://exaroton.com/)-hosted Minecraft server — with real-time chat sync, a whitelist system, and death tracking. No mods or plugins required.
 
--  Discord ↔ Minecraft Chat Bridge: Talk with your SMP teammates on Discord or in-game with messages synced both ways.
+---
 
-- Whitelist System: You must whitelist on Discord to be able to join the Minecraft server.
+## Features
 
-- Vanilla SMP support: Works with standard Minecraft servers without needing mods or plugins!
+| Feature | Description |
+|---|---|
+| 💬 **Chat Bridge** | Messages sync both ways between Discord and Minecraft in real time |
+| 📋 **Whitelist Management** | Players must whitelist via Discord before they can join the server |
+| 💀 **Death Counter** | Track how many times each player has died |
+| 🔧 **Admin Tools** | Moderator commands for managing the whitelist and syncing roles |
+| 🪨 **Vanilla Compatible** | Works on standard Minecraft servers — no mods or plugins needed |
 
+---
 
+## Prerequisites
 
-# How To Use
+Before setting up the bot, make sure you have:
 
-- Create a Discord bot and invite it to your server.
+- [Node.js](https://nodejs.org/) installed (v16 or higher recommended)
+- A [Discord bot token](https://discord.com/developers/applications)
+- An [Exaroton API key](https://exaroton.com/account/) and your server ID
+- Your Discord server set up with a **player role**, a **moderator role**, and a **chat relay channel**
 
-- Configure the .env with your Exaroton API key and server ID. as well as your Discord bot token.
+---
 
-- Create both a player role and a moderator role in your Discord server, then configure the .env to use those roles.
+## Setup
 
-- Also create a channel for the bot to relay chat messages. and then configure the .env to use that channel.
+**1. Clone the repository**
+```bash
+git clone https://github.com/mashpotatle/Exaroton-Discord-Bot.git
+cd Exaroton-Discord-Bot
+```
 
-- (replace the 1s in the env with your keys and ids)
+**2. Install dependencies**
+```bash
+npm install
+```
 
-# Commands Overview
+**3. Configure your `.env` file**
 
-User Commands
+Open the `.env` file and fill in your credentials:
 
-    /whitelist Add username: – Begin the whitelist process to get verified
-    
-    /whitelist Update username: – Update your username for the server's whitelist if it has changed
+```env
+DISCORD_TOKEN=your_discord_bot_token
+EXAROTON_API_KEY=your_exaroton_api_key
+EXAROTON_SERVER_ID=your_exaroton_server_id
 
-    /whitelist Remove: – Remove your current whitelisted username
+PLAYER_ROLE_ID=your_player_role_id
+MOD_ROLE_ID=your_moderator_role_id
+CHAT_CHANNEL_ID=your_chat_relay_channel_id
+```
 
-    /whitelist Show: – Shows your current whitelisted username
-    
-    /deathcount – Shows death count per your whitelisted username
+**4. Invite the bot to your Discord server**
 
-Admin Only Commands
+In the [Discord Developer Portal](https://discord.com/developers/applications), generate an invite link with the `bot` and `applications.commands` scopes and the necessary permissions (Send Messages, Manage Roles, etc.).
 
-    /list - shows all discord accounts with listed usernames
+**5. Run the bot**
+```bash
+node index.js
+```
 
-    /resync roles - resync player roles from whitelist.json
+---
 
-    /resync exaroton - resync player roles from whitelist.json
+## Project Structure
+
+```
+Exaroton-Discord-Bot/
+├── commands/        # Slash command definitions and handlers
+├── data/            # Persistent data (e.g. whitelist.json)
+├── utils/           # Helper functions (API calls, role management, etc.)
+├── index.js         # Bot entry point — starts everything up
+├── package.json     # Project dependencies
+└── .env             # Your secret keys (never share this!)
+```
+
+**How it works at a high level:**
+- `index.js` starts the bot, connects to Discord and to Exaroton's WebSocket for live events
+- When a player chats in Minecraft, the Exaroton API fires an event → the bot forwards it to your Discord channel
+- When someone types in the Discord relay channel, the bot sends it to the Minecraft server via the Exaroton API
+- The whitelist commands update `data/whitelist.json` and use the Exaroton API to add/remove players from the server whitelist
+
+---
+
+## Commands
+
+### Player Commands
+
+| Command | Description |
+|---|---|
+| `/whitelist add <username>` | Start the whitelist process to get verified and join the server |
+| `/whitelist update <username>` | Update your username if it has changed |
+| `/whitelist remove` | Remove yourself from the whitelist |
+| `/whitelist show` | Display your currently whitelisted username |
+| `/deathcount` | Show your death count on the server |
+
+### Admin Only Commands
+
+| Command | Description |
+|---|---|
+| `/list` | Show all Discord accounts with their linked Minecraft usernames |
+| `/resync roles` | Re-assign player roles based on the current `whitelist.json` |
+| `/resync exaroton` | Push the current whitelist to Exaroton to sync the server |
